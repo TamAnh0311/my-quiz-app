@@ -1,0 +1,25 @@
+{
+  "name": "nuxt-quiz-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@mdi/font": "^7.4.47",
+    "docx-parser": "^0.2.1",
+    "mammoth": "^1.8.0",
+    "nuxt": "^3.13.0",
+    "phaser": "^3.85.2",
+    "sass": "^1.32.0",
+    "sass-loader": "^10.1.1",
+    "vite-plugin-vuetify": "^2.0.4",
+    "vue": "latest",
+    "vue-router": "latest",
+    "vuetify": "^3.7.0-beta.1"
+  }
+}
