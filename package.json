@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "nuxt build && cp -r static/.output/static/",
+    "build": "nuxt build && cp -r static/. .output/static",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
