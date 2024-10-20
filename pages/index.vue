@@ -48,22 +48,28 @@
       <p>Loading questions...</p>
     </div>
 
-    <div class="floating-btn d-flex justify-space-between align-center">
-      <div class="d-flex align-center">
-        <v-btn color="primary" size="large" round @click="toggleQuiz">
-          {{ isTracking ? "Stop Tracking" : "Start Tracking" }}
-        </v-btn>
-
-        <div class="ml-3 quiz-tracker d-flex" v-if="isTracking">
+    <div class="floating-btn d-flex justify-space-between" :class="alignClass">
+      <div class="d-flex flex-column align-center quiz-controls">
+        <div class="quiz-tracker" v-if="isTracking">
           <p><strong>Time:</strong> {{ formatTime(timer) }}</p>
-          <p class="ml-3">
+          <p>
             <strong>Question:</strong> {{ currentQuestionIndex + 1 }} /
             {{ questions.length }}
           </p>
         </div>
+
+        <v-btn
+          color="primary"
+          size="large"
+          round
+          @click="toggleQuiz"
+          class="mt-2"
+        >
+          {{ isTracking ? "Stop Tracking" : "Start Tracking" }}
+        </v-btn>
       </div>
 
-      <div>
+      <div class="d-flex">
         <v-btn
           color="primary"
           size="large"
@@ -97,6 +103,7 @@ export default {
       timer: 0,
       currentQuestionIndex: 0,
       intervalId: null,
+      windowWidth: window.innerWidth, // Initialize the width
     };
   },
   async mounted() {
@@ -106,15 +113,20 @@ export default {
     this.questions.forEach((question) => {
       question.selectedChoices = [];
     });
-  },
 
+    window.addEventListener("resize", this.handleResize); // Add resize listener
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.handleResize); // Cleanup listener
+  },
   methods: {
+    handleResize() {
+      this.windowWidth = window.innerWidth; // Update the width
+    },
     toggleQuiz() {
       if (this.isTracking) {
-        // Stop the quiz
         this.stopQuiz();
       } else {
-        // Start the quiz
         this.startQuiz();
       }
     },
@@ -160,15 +172,22 @@ export default {
 
     checkAnswer(index) {
       this.questions[index].isAnswered = true;
-      this.scrollToNext(index);
     },
 
     isCorrectAnswer(question, letter) {
-      return question.isAnswered && question.answer.includes(letter);
+      return (
+        question.isAnswered &&
+        question.selectedChoices.includes(letter) &&
+        question.answer.includes(letter)
+      );
     },
 
     isWrongAnswer(question, letter) {
-      return question.isAnswered && !question.answer.includes(letter);
+      return (
+        question.isAnswered &&
+        question.selectedChoices.includes(letter) &&
+        !question.answer.includes(letter)
+      );
     },
 
     scrollToTop() {
@@ -199,6 +218,14 @@ export default {
       }
     },
   },
+  computed: {
+    alignClass() {
+      return {
+        "align-center": this.windowWidth > 600,
+        "align-end": this.windowWidth <= 600,
+      };
+    },
+  },
 };
 </script>
 
@@ -225,13 +252,10 @@ export default {
   z-index: 999;
 }
 
-.floating-btn div {
-  margin-left: 10px;
-}
-
 .quiz-tracker {
   background-color: #6c6a6ac7;
   color: #ffffff;
   padding: 5px;
+  margin-bottom: 10px; /* Adds space between the tracker and the button */
 }
 </style>
