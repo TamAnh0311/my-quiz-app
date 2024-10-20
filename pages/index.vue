@@ -51,10 +51,10 @@
     <div class="floating-btn d-flex justify-space-between align-center">
       <div class="d-flex align-center">
         <v-btn color="primary" size="large" round @click="toggleQuiz">
-          {{ isQuizStarted ? "Stop Counting" : "Start Counting" }}
+          {{ isTracking ? "Stop Tracking" : "Start Tracking" }}
         </v-btn>
 
-        <div class="ml-3 quiz-checker d-flex" v-if="isQuizStarted">
+        <div class="ml-3 quiz-tracker d-flex" v-if="isTracking">
           <p><strong>Time:</strong> {{ formatTime(timer) }}</p>
           <p class="ml-3">
             <strong>Question:</strong> {{ currentQuestionIndex + 1 }} /
@@ -93,7 +93,7 @@ export default {
   data() {
     return {
       questions: [],
-      isQuizStarted: false,
+      isTracking: false,
       timer: 0,
       currentQuestionIndex: 0,
       intervalId: null,
@@ -110,7 +110,7 @@ export default {
 
   methods: {
     toggleQuiz() {
-      if (this.isQuizStarted) {
+      if (this.isTracking) {
         // Stop the quiz
         this.stopQuiz();
       } else {
@@ -120,12 +120,12 @@ export default {
     },
 
     startQuiz() {
-      this.isQuizStarted = true;
+      this.isTracking = true;
       this.startTimer();
     },
 
     stopQuiz() {
-      this.isQuizStarted = false;
+      this.isTracking = false;
       this.stopTimer();
       this.resetQuiz();
     },
@@ -229,7 +229,7 @@ export default {
   margin-left: 10px;
 }
 
-.quiz-checker {
+.quiz-tracker {
   background-color: #6c6a6ac7;
   color: #ffffff;
   padding: 5px;
