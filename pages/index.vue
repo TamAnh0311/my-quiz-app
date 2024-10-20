@@ -22,8 +22,10 @@
             :value="letter"
             :label="letter + ': ' + choice"
             v-model="question.selectedChoices"
+            class="answer"
             :class="{
               'correct-answer': isCorrectAnswer(question, letter),
+              'correct-answer-reveal': revealAnswer(question, letter),
               'wrong-answer': isWrongAnswer(question, letter),
             }"
           ></v-checkbox>
@@ -182,6 +184,10 @@ export default {
       );
     },
 
+    revealAnswer(question, letter) {
+      return question.isAnswered && question.answer.includes(letter);
+    },
+
     isWrongAnswer(question, letter) {
       return (
         question.isAnswered &&
@@ -233,11 +239,18 @@ export default {
 .question-description {
   background: #80808026;
   padding: 10px;
-  border-radius: 5%;
+  border-radius: 5px;
 }
 
+.answer {
+  border-radius: 5px;
+}
 .correct-answer {
   background-color: #b9f0c0;
+}
+
+.correct-answer-reveal {
+  border: 2px solid #61b96c;
 }
 
 .wrong-answer {
