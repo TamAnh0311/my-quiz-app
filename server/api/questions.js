@@ -57,13 +57,16 @@ export default defineEventHandler(async (event) => {
 async function parseQuestions(text) {
   let questions = [];
   const paragraphs = text.split(";");
-
-  for (const paragraph of paragraphs) {
+  let index = 0
+  for (const paragraph  of paragraphs) {
     const [answer, question] = paragraph.split("&&");
     if (question) {
       const questionObj = transformToQuestionObject(question.trim());
       questionObj.answer = answer ? answer.trim() : null;
+      questionObj.id = index
+      
       questions.push(questionObj);
+      index++
     }
   }
 
@@ -84,7 +87,7 @@ async function writeQuestionsFile(data) {
 
 function transformToQuestionObject(text) {
   const lines = text.trim().split('\n');
-  const choiceLetters = ['A', 'B', 'C', 'D'];
+  const choiceLetters = ['A', 'B', 'C', 'D', 'E'];
   const choiceStartIndex = lines.findIndex(line => {
     const trimmedLine = line.trim();
     return choiceLetters.some(letter => trimmedLine.startsWith(`${letter}.`));

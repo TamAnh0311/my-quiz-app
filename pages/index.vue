@@ -10,8 +10,18 @@
         :ref="'question_' + index"
       >
         <p class="question-description">
-          <strong>Question {{ index + 1 }}:</strong> {{ question.question }}
+          <strong>Question {{ index + 1 }} [{{ question.id }}]:</strong> {{ question.question }}
         </p>
+
+        <div class="mt-5" v-if="question.imageExists">
+          <v-img
+            :src="`/images/${question.id}.png`"
+            alt="Dynamic Image"
+            cover
+          ></v-img>
+        </div>
+        <div v-else>
+        </div>
 
         <div class="mt-4">
           <v-checkbox
@@ -105,25 +115,34 @@ export default {
       timer: 0,
       currentQuestionIndex: 0,
       intervalId: null,
-      windowWidth: window.innerWidth, // Initialize the width
+      windowWidth: window.innerWidth,
     };
   },
   async mounted() {
     const response = await $fetch("/api/questions");
     this.questions = this.shuffleArray(response.questions) || [];
 
-    this.questions.forEach((question) => {
+    for (const question of this.questions) {
       question.selectedChoices = [];
-    });
+      question.imageExists = await this.checkImageExists(`/images/${question.id}.png`);
+    }
 
-    window.addEventListener("resize", this.handleResize); // Add resize listener
+    window.addEventListener("resize", this.handleResize);
   },
   beforeDestroy() {
-    window.removeEventListener("resize", this.handleResize); // Cleanup listener
+    window.removeEventListener("resize", this.handleResize);
   },
   methods: {
+    checkImageExists(imageUrl) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.src = imageUrl;
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+      });
+    },
     handleResize() {
-      this.windowWidth = window.innerWidth; // Update the width
+      this.windowWidth = window.innerWidth;
     },
     toggleQuiz() {
       if (this.isTracking) {
@@ -132,29 +151,24 @@ export default {
         this.startQuiz();
       }
     },
-
     startQuiz() {
       this.isTracking = true;
       this.startTimer();
     },
-
     stopQuiz() {
       this.isTracking = false;
       this.stopTimer();
       this.resetQuiz();
     },
-
     startTimer() {
       this.intervalId = setInterval(() => {
         this.timer++;
       }, 1000);
     },
-
     stopTimer() {
       clearInterval(this.intervalId);
       this.intervalId = null;
     },
-
     resetQuiz() {
       this.timer = 0;
       this.currentQuestionIndex = 0;
@@ -163,47 +177,29 @@ export default {
         question.selectedChoices = [];
       });
     },
-
     formatTime(seconds) {
       const minutes = Math.floor(seconds / 60);
       const remainingSeconds = seconds % 60;
-      return `${minutes}:${
-        remainingSeconds < 10 ? "0" : ""
-      }${remainingSeconds}`;
+      return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
     },
-
     checkAnswer(index) {
       this.questions[index].isAnswered = true;
     },
-
     isCorrectAnswer(question, letter) {
-      return (
-        question.isAnswered &&
-        question.selectedChoices.includes(letter) &&
-        question.answer.includes(letter)
-      );
+      return question.isAnswered && question.selectedChoices.includes(letter) && question.answer.includes(letter);
     },
-
     revealAnswer(question, letter) {
       return question.isAnswered && question.answer.includes(letter);
     },
-
     isWrongAnswer(question, letter) {
-      return (
-        question.isAnswered &&
-        question.selectedChoices.includes(letter) &&
-        !question.answer.includes(letter)
-      );
+      return question.isAnswered && question.selectedChoices.includes(letter) && !question.answer.includes(letter);
     },
-
     scrollToTop() {
       window.scrollTo({ top: 0, behavior: "smooth" });
     },
-
     reloadPage() {
       window.location.reload();
     },
-
     shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -211,7 +207,6 @@ export default {
       }
       return array;
     },
-
     scrollToNext(index) {
       if (index + 1 < this.questions.length) {
         this.currentQuestionIndex++;
@@ -241,22 +236,18 @@ export default {
   padding: 10px;
   border-radius: 5px;
 }
-
 .answer {
   border-radius: 5px;
 }
 .correct-answer {
   background-color: #b9f0c0;
 }
-
 .correct-answer-reveal {
   border: 2px solid #61b96c;
 }
-
 .wrong-answer {
   background-color: #f2c3c3;
 }
-
 .floating-btn {
   position: fixed;
   bottom: 20px;
@@ -264,11 +255,10 @@ export default {
   left: 0;
   z-index: 999;
 }
-
 .quiz-tracker {
   background-color: #6c6a6ac7;
   color: #ffffff;
   padding: 5px;
-  margin-bottom: 10px; /* Adds space between the tracker and the button */
+  margin-bottom: 10px;
 }
 </style>
